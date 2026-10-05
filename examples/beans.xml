@@ -1,3 +1,0 @@
-<beans>
-    <bean id="repository" class="IocLab$MemoryRepository"/>
-</beans>

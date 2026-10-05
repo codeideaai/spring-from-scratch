@@ -5,13 +5,15 @@ import subprocess
 
 from article_sources import EXPECTED, article_sources
 from verify_editions import verify_editions
+from verify_project_alignment import verify_project_alignment
 
 ROOT = Path(__file__).resolve().parents[1]
 H2 = ROOT / 'build/lib/h2-2.2.224.jar'
-DATABASE_CHAPTERS = {11, 12, 16, 17}
+DATABASE_CHAPTERS = {5, 6, 7, 8, 9, 10, 11, 13, 15, 16, 17}
 
 def main():
     verify_editions()
+    verify_project_alignment()
     failures = []
     count = 0
     for language, article, text, block in article_sources():
@@ -35,7 +37,7 @@ def main():
                 continue
             classpath += os.pathsep + str(H2)
         result = subprocess.run(['java', '-cp', classpath, name], cwd=directory,
-                                text=True, capture_output=True, timeout=20)
+                                text=True, capture_output=True, timeout=60)
         expected = EXPECTED.search(text)
         if result.returncode:
             failures.append(f'{article.name}:\n{result.stderr}')

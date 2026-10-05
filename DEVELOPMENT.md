@@ -1,66 +1,54 @@
-# 阅读站点维护
+# 维护与验证
 
-本项目使用 Quarto 构建教程网站，并通过 GitHub Pages 发布。文章的完整 Java 代码直接保存在 Markdown 中，网站渲染不会执行或删除这些代码。
+网站由 Quarto 1.10.18 构建，经 GitHub Actions 发布到 GitHub Pages。根地址默认跳转到英文版 en/，中文首页为 zh.html。文章围绕图书预约业务组织，导航同时维护中英文。
 
-## 本地预览
+## 内容与代码
 
-安装 Quarto 1.10.18 后，在仓库根目录运行：
+- tutorial 与 en/tutorial 各包含导读、17 篇完整程序和两篇附录。
+- 每个编号正文必须包含一个完整 Java 代码块、编译命令和预期输出。Demo01 至 Demo17 各自独立编译，不借用 examples 中的类。
+- examples/library 是常规包结构的独立项目，含 13 个主源码文件和 1 个验收源码文件。
+- 中英文注释可以不同，但可执行代码与输出保持一致。tools/verify_editions.py 检查词法一致性，不是任意程序的语义等价证明。
+- 章节依赖 H2 的集合由 tools/verify_article_code.py 中 DATABASE_CHAPTERS 声明，目前为 05–11、13、15–17。修改章节结构时同步调整。
 
-```bash
-quarto preview
-quarto render
-```
+文章与分文件项目是两份可运行形态。tools/verify_project_alignment.py 对照项目源码检查正文中的共享组件，明确排除第 11、12 篇的早期 BeanBox 和第 16 篇不含启动入口的 LibraryApp 快照。修改共享机制时同步相关正文及项目；不要只更新一方。使用新文件名时同步 README、导读、下一篇和 _quarto.yml 的目录。不要保留指向已删除旧章节的导航。
 
-中文首页从 README.md 引入内容，英文首页从 en/README.md 引入内容；tutorial 与 en/tutorial 下的文章渲染为 HTML。站点具有独立的中英文目录、语言切换、搜索、深色模式、页内目录和代码复制按钮。构建目录 _site 与缓存目录 .quarto 不提交到 Git。
+## Google Style 与关键注释
 
-修改章节后，同时检查 README 的目录与 _quarto.yml 的侧栏。正文必须保留完整代码、编译命令和预期输出。
-
-## 中英文同步
-
-英文版地址为 `https://codeideaai.github.io/spring-from-scratch/en/`。每篇正文顶部链接到另一种语言的对应章节，原有中文地址保持不变。`en/_metadata.yml` 设置英文界面文案和侧栏。
-
-两种语言各包含导读、17 篇独立程序和两篇附录。修改实现时同步两篇文章；Java 注释可以按语言分别撰写，但可执行代码、字符串和预期输出应一致。新增章节时同步调整目录和 `tools/article_sources.py` 中的完整性校验。
-
-可用 `python3 tools/verify_editions.py` 快速检查代码与输出一致性。它按 Java 词法单元比较，忽略注释及代码外部空白，保留字符串和文本块；不是对任意两份程序进行语义等价证明。完整编译验证也会先执行此检查。
-
-## Java 格式与关键注释
-
-文章内的 Java 代码与 `examples/*.java` 统一使用 Spotless 的 Google Java Style（两空格缩进），固定 Spotless 3.10.3 和 google-java-format 1.24.0，与 JDK 17 配合运行。Maven Wrapper 固定 Maven 3.9.9，不需要另行安装 Maven；首次运行会下载 Maven 和插件。
-
-在仓库根目录执行：
+使用 Maven Wrapper 3.9.9、Spotless 3.10.3 和 google-java-format 1.24.0，GOOGLE 风格。所需 Java 版本为 17。注释重点说明业务不变量、创建与增强顺序、连接和资源归属、错误传播，不逐行复述语句。
 
 ```bash
 python3 tools/format_java.py apply
 python3 tools/format_java.py check
 ```
 
-脚本先将每篇正文的完整 Java 代码块提取到 `build/spotless-articles`，再调用 `./mvnw spotless:apply` 或 `./mvnw spotless:check`。Windows 使用 `mvnw.cmd`。`apply` 会将格式化后的代码写回原文章，保留正文说明、编译命令和预期输出；`check` 不修改文章和示例。生成目录不是源码，请直接编辑文章中的代码。
+脚本提取两种语言共 34 份程序到 build/spotless-articles，运行 Spotless，并在 apply 时只将格式化代码写回正文。项目的 examples/**/*.java 同样纳入检查，共 48 份 Java 文件。直接运行 mvnw spotless:apply 不会回写正文，因此维护与 CI 使用 Python 入口。禁止通配符导入。
 
-直接执行 `./mvnw spotless:apply` 不会更新文章，因此日常维护和 CI 都应使用上面的 Python 入口。代码使用明确的类导入；Spotless 拒绝通配符导入并整理排版，但不代替代码行为验证。
-
-注释重点解释创建顺序、状态变化、资源所有权、异常处理和教学实现的边界，不必逐行复述代码。重复出现在后续章节的核心实现也保留这些注释，使每篇都能独立阅读。代码修改后先执行 `apply`，再执行 `check` 和下方的行为验证。
-
-## 验证文章内代码
-
-准备 JDK 17、Python 3 和 H2 驱动后执行：
+## 行为验证
 
 ```bash
 mkdir -p build/lib
-curl -fL -o build/lib/h2-2.2.224.jar \
-  https://repo.maven.apache.org/maven2/com/h2database/h2/2.2.224/h2-2.2.224.jar
+curl -fL -o build/lib/h2-2.2.224.jar https://repo.maven.apache.org/maven2/com/h2database/h2/2.2.224/h2-2.2.224.jar
+python3 tools/verify_editions.py
 python3 tools/verify_article_code.py
+bash examples/library/run.sh test
+python3 tools/verify_library_restart.py
 ```
 
-脚本检查两种语言各 17 篇文章，从正文提取完整 Java 程序，在按语言和篇号隔离的目录中编译、执行并比较预期输出，共 34 份程序，不使用 examples 目录中的早期实验作为代码依赖。
+文章校验在各自隔离目录中编译执行并比较输出。第 05 篇明确验证一个故意保留的自动提交反例；第 17 篇会启动临时 HTTP 服务并执行真实数据库和竞争检查。
 
-## 自动发布
+项目验收单独运行，涵盖提交、回滚、重复、连接清理、竞争、HTTP、UTF-8 和生命周期。进程重启检查在临时目录创建文件型 H2，先后启动两个服务进程验证持久化；测试结束后仅清理自己启动的进程和临时目录。HTTP 检查需要允许监听本机端口。
 
-目标仓库为 codeideaai/spring-from-scratch。GitHub 仓库 Settings → Pages → Build and deployment → Source 选择 GitHub Actions。
+## 网站
 
-main 分支更新后，Publish tutorial website 工作流先检查 Java 格式并验证文章代码，再构建并发布阅读站点。也可以在 Actions 中手动触发。首次使用需要仓库已启用 Pages，并允许工作流部署 github-pages 环境。
+```bash
+quarto preview
+quarto render
+```
 
-站点地址：https://codeideaai.github.io/spring-from-scratch/
+中文首页引入 README.md，英文首页引入 en/README.md；filters/site-links.lua 将仓库 Markdown 导航映射为网页，并加载 Mermaid。示例项目文档链接指向 GitHub 文件，不作为课程网页渲染。
 
-工具配置参考：[Quarto GitHub Pages 发布文档](https://quarto.org/docs/publishing/github-pages.html)。
+重命名章节后，本地 _site 中可能保留旧输出，应先清理这个生成目录，再完整构建。_site、.quarto、build 与 target 不提交。
 
-网站根地址默认跳转到英文版 `en/`，中文首页为 `zh.qmd`（发布后 `zh.html`）。中文文章保留原有 URL；`tutorial/_metadata.yml` 保持中文界面，英文目录使用英文界面。
+main 更新后，工作流检查格式、34 份文章程序、独立项目和跨进程持久化，再构建发布网站。默认英文入口、中英文逐篇切换与站内链接都应随发布验证。
+
+站点：[Spring from Scratch](https://codeideaai.github.io/spring-from-scratch/)。

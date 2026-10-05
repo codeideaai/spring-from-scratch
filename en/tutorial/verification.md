@@ -1,74 +1,61 @@
 ---
-pagetitle: "Verification of the Code Printed in the Articles"
+pagetitle: "Reservation Tutorial Verification"
 ---
 
-# Verification of the Code Printed in the Articles
+# Reservation Tutorial Verification
 
 [中文](../../tutorial/验证记录.md) · [Series contents](../README.md)
 
-Verification extracts code directly from the articles to check that readers can copy and run each chapter independently. The local environment is macOS with OpenJDK 17.0.20, targeting Java 17 and using H2 2.2.224.
+On October 5, 2026, all 34 rebuilt article programs compiled independently, executed and matched their printed output. The new library application's acceptance checks also passed. Verification extracts code directly from each article without borrowing implementation types from the example project.
 
-On October 5, 2026, both editions passed all 34 independent compilation, execution and output checks. Spotless checked 41 Java files (34 article programs and 7 companion examples), and all 17 bilingual implementation/output pairs matched.
+## Coverage
 
-## Independent compilation
-
-Each edition contains one complete Java block per chapter from 01 through 17, saved as Demo01.java through Demo17.java. Each program is compiled in its own directory; its classpath does not include another chapter or the earlier companion experiments.
-
-The verification script compiles and executes all 34 programs and compares their output with the expected output printed in the corresponding article. Chapters 11, 12, 16 and 17 use an actual H2 in-memory database. The remaining chapters use only the JDK standard library. A separate parity check compares executable Java tokens and expected outputs across languages, allowing comments and formatting to differ.
-
-| Chapter | Verification coverage |
+| Chapter | Verified behavior |
 | --- | --- |
-| 01 | First creation, singleton identity, missing definitions |
-| 02 | Separation of XML loading and instantiation, singleton identity |
-| 03 | Constructor and setter injection, singleton and prototype scopes |
-| 04 | Setter-cycle identity, early-cache cleanup and failure invalidation |
-| 05 | Before/after initialization order, final-instance caching, destruction |
-| 06 | Annotation injection, identity, rejection of ambiguous type lookup |
-| 07 | Refresh event, parent dependencies, closing a child without closing its parent |
-| 08 | Dispatch, 404, 405, duplicate-route rejection |
-| 09 | Explicit parameter names, numeric conversion, missing values and invalid booleans |
-| 10 | Text and view results, HTML escaping, error responses |
-| 11 | Actual SQL, row mapping, empty results, update counts |
-| 12 | Mapper XML, selectOne, update, repeated parameters, zero and multiple rows |
-| 13 | JDK proxies, self-invocation, original business exceptions, proxy equality |
-| 14 | Interceptor ordering, return values, forwarding of unmatched methods |
-| 15 | Automatic proxying, injected/cached proxy identity, advice on repeated calls |
-| 16 | Shared connection identity, commit, rollback, ThreadLocal cleanup, nesting rejection |
-| 17 | MVC, IoC, AOP, Service, Repository and database integration |
+| 01 | Valid requests, duplicate rejection and conservation of copies |
+| 02 | Two real threads compete for the final copy; exactly one succeeds |
+| 03 | 201, 409, 404, 405 and Allow contract |
+| 04 | Order-independent binding; missing, invalid, duplicate and malformed values |
+| 05 | An intentional partial auto-commit against real H2 |
+| 06 | Failure between writes restores both stock and reservations |
+| 07 | Template connection sharing and rollback of a unique-constraint failure |
+| 08 | Service proxy transaction boundary and duplicate rollback |
+| 09 | Audit success follows commit; failures do not record success |
+| 10 | Factory caching and final-service singleton identity |
+| 11 | Constructor resolution and cycle rejection |
+| 12 | Startup-failure cleanup and idempotent close |
+| 13 | Final proxy caching and actual transaction behavior |
+| 14 | Annotation routing, duplicates, named binding and conversion |
+| 15 | XML assembly and unknown-attribute rejection |
+| 16 | Complete request path with 201, 409, 500 and database-state assertions |
+| 17 | Real HTTP, UTF-8, concurrent stock, reopening and lifecycle checks |
 
-Maintainer scripts live in the repository's tools directory. Readers do not need them: each chapter already contains its compilation and execution commands.
+A passing Chapter 5 deliberately reproduces a partial commit; it does not establish atomicity for that version. Database chapters are 05–11, 13 and 15–17, using actual H2 2.2.224. Chapter 17 opens a temporary HTTP listener and includes a two-thread race by default.
 
-## Comments and formatting
+## Reproduce the checks
 
-The Chinese edition's October 4, 2026 update added key implementation comments and standardized 17 article programs plus seven companion Java files using Spotless 3.10.3 and google-java-format 1.24.0 in GOOGLE mode. Its compilation, output comparisons, five companion experiments, JdbcLab h2 and FullStackLab checks all passed.
+```bash
+python3 tools/format_java.py check
+python3 tools/verify_article_code.py
+bash examples/library/run.sh test
+python3 tools/verify_library_restart.py
+```
 
-The English edition translates those comments and extends formatting checks to 41 Java sources: 34 article programs and seven shared examples. Explicit imports are required; wildcard imports are rejected. Run `python3 tools/format_java.py check` from the repository root. To format and write results back into both editions, use `python3 tools/format_java.py apply`.
+Prepare JDK 17 and H2 using the homepage commands first. Spotless 3.10.3 uses google-java-format 1.24.0 in GOOGLE mode for 48 Java files: 34 article programs and 14 application source files. Comments use each edition's language; executable tokens and expected output are compared for every chapter pair. Project alignment also checks 83 shared component snapshots covering all 14 source files, with three explicitly declared earlier-stage variants.
 
-The publication workflow checks formatting before code execution and website rendering. The English edition's code is kept inline rather than linked to external source files.
+The standalone application checks commit, duplicate identifiers/members, failure between writes, thread cleanup, nesting rejection, the last-copy race, HTTP and startup resource cleanup. A separate process-restart script uses a temporary file database, launches two Java processes sequentially, and checks that stock is not reseeded and existing membership still prevents duplicate reservation.
 
-## Recorded HTTP verification
+## HTTP contract checks
 
-The original Chinese-edition validation started Demo17 serve from the extracted article code at 127.0.0.1:8080. The service used H2 rather than fixed-response stubs and was stopped after testing. These results document that HTTP validation; they are distinct from the default integration assertions run by the automated article checker.
-
-| Request | Result |
+| Scenario | Result |
 | --- | --- |
-| GET /users?id=7 | 200, Lin |
-| POST /rename?id=7&name=Grace | 200, renamed |
-| GET /users?id=7 again | 200, Grace |
-| POST /rename-fail?id=7&name=Bad | 500, controller failed |
-| Query after the failed update | Still Grace, demonstrating rollback |
-| GET /users?id=bad | 400 |
-| GET /missing | 404 |
-| POST /users?id=7 | 405, Allow: GET |
-| GET /users?id=7&id=8 | 400, duplicate parameter rejected |
-| Update and query a name containing Chinese characters | 200, text returned correctly |
+| Read an existing book | 200 |
+| Valid reservation | 201 with stock decrement and a corresponding record |
+| Duplicate member or identifier | 409 with restored stock |
+| Missing values, invalid numbers or repeated query parameters | 400 |
+| Missing book or route | 404 |
+| GET /reservations | 405 with Allow: POST |
+| Injected failure after stock change | Router returns 500; both tables retain their prior state |
+| Chinese member name | Correct UTF-8 and Content-Length equal to actual byte length |
 
-The check also compared Content-Length with the actual UTF-8 byte length.
-
-## Scope of these checks
-
-Each article provides complete code, execution steps, expected output, implementation discussion and exercises. Chapter navigation and local links are checked separately when building the reading site.
-
-Passing these checks does not imply concurrent container creation, Servlet support, general JSON handling, component scanning, a general SQL parser, pooling or transaction propagation. Those boundaries remain explicit in the articles. Chapter 4's early-reference experiment is separate from the main container, which continues to reject dependency cycles.
-
-Return to the [series contents](../README.md).
+The failure hook is supplied by tests during application construction, not exposed as a public HTTP endpoint. Passing these checks is not a production-readiness claim. See [implementation boundaries](implementation-notes.md).

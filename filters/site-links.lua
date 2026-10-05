@@ -1,6 +1,9 @@
 -- Keep repository Markdown navigation while linking back to the HTML home page.
 function Link(link)
-  if quarto.doc.is_format("html") and link.target == "../README.md" then
+  if quarto.doc.is_format("html") and link.target:match("examples/library/README[^/]*%.md$") then
+    local filename = link.target:match("(README[^/]*%.md)$")
+    link.target = "https://github.com/codeideaai/spring-from-scratch/blob/main/examples/library/" .. filename
+  elseif quarto.doc.is_format("html") and link.target == "../README.md" then
     -- English chapters return to their edition; Chinese links use its own home.
     local input = quarto.doc.input_file:gsub("\\", "/")
     if input:match("en/tutorial/[^/]+$") then

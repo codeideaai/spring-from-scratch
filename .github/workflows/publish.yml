@@ -33,6 +33,10 @@ jobs:
             https://repo.maven.apache.org/maven2/com/h2database/h2/2.2.224/h2-2.2.224.jar
       - name: Verify code printed in the articles
         run: python3 tools/verify_article_code.py
+      - name: Verify library application
+        run: bash examples/library/run.sh test
+      - name: Verify persistence across process restart
+        run: python3 tools/verify_library_restart.py
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
         with:
