@@ -1,0 +1,151 @@
+project:
+  type: website
+  output-dir: _site
+  render:
+    - index.qmd
+    - zh.qmd
+    - tutorial/*.md
+    - en/index.qmd
+    - en/tutorial/*.md
+
+website:
+  title: "Spring from Scratch"
+  description: "Build a framework step by step, from IoC to MVC, JDBC, AOP and transactions. Complete runnable Java code in every chapter."
+  site-url: "https://codeideaai.github.io/spring-from-scratch/"
+  repo-url: "https://github.com/codeideaai/spring-from-scratch"
+  page-navigation: true
+  back-to-top-navigation: true
+  navbar:
+    title: false
+    left:
+      - text: "English"
+        href: en/index.qmd
+      - text: "中文"
+        href: zh.qmd
+  sidebar:
+    - id: zh
+      title: "教程目录"
+      style: docked
+      search: true
+      contents:
+        - href: zh.qmd
+          text: "课程介绍"
+        - href: tutorial/00-导读与学习路线.md
+          text: "00 导读与学习路线"
+        - href: tutorial/01-实现第一个Bean容器.md
+          text: "01 实现第一个Bean容器"
+        - href: tutorial/02-把配置转换成Bean定义.md
+          text: "02 把配置转换成Bean定义"
+        - href: tutorial/03-实现构造器和属性注入.md
+          text: "03 实现构造器和属性注入"
+        - href: tutorial/04-理解循环依赖与早期引用.md
+          text: "04 理解循环依赖与早期引用"
+        - href: tutorial/05-管理Bean生命周期与扩展点.md
+          text: "05 管理Bean生命周期与扩展点"
+        - href: tutorial/06-让注解驱动依赖注入.md
+          text: "06 让注解驱动依赖注入"
+        - href: tutorial/07-组织应用上下文与事件.md
+          text: "07 组织应用上下文与事件"
+        - href: tutorial/08-从请求入口实现MVC分发.md
+          text: "08 从请求入口实现MVC分发"
+        - href: tutorial/09-把请求参数绑定到方法参数.md
+          text: "09 把请求参数绑定到方法参数"
+        - href: tutorial/10-处理返回值与渲染视图.md
+          text: "10 处理返回值与渲染视图"
+        - href: tutorial/11-用模板封装JDBC访问.md
+          text: "11 用模板封装JDBC访问"
+        - href: tutorial/12-把SQL变成可管理的元数据.md
+          text: "12 把SQL变成可管理的元数据"
+        - href: tutorial/13-用动态代理增强业务方法.md
+          text: "13 用动态代理增强业务方法"
+        - href: tutorial/14-构造拦截链与切点.md
+          text: "14 构造拦截链与切点"
+        - href: tutorial/15-把自动代理接入IoC.md
+          text: "15 把自动代理接入IoC"
+        - href: tutorial/16-用事务串联AOP与JDBC.md
+          text: "16 用事务串联AOP与JDBC"
+        - href: tutorial/17-综合实战与自测.md
+          text: "17 综合实战与自测"
+        - section: "附录"
+          contents:
+            - href: tutorial/验证记录.md
+              text: "代码验证记录"
+            - href: tutorial/实现边界与延伸阅读.md
+              text: "实现边界与延伸阅读"
+    - id: en
+      title: "Course contents"
+      logo-href: en/index.qmd
+      style: docked
+      search: true
+      contents:
+        - href: en/index.qmd
+          text: "Course overview"
+        - href: en/tutorial/00-guide.md
+          text: "00 Series Guide and Learning Path"
+        - href: en/tutorial/01-first-bean-container.md
+          text: "01 Build Your First Bean Container"
+        - href: en/tutorial/02-configuration-to-bean-definitions.md
+          text: "02 Turn Configuration into Bean Definitions"
+        - href: en/tutorial/03-constructor-and-property-injection.md
+          text: "03 Implement Constructor and Property Injection"
+        - href: en/tutorial/04-circular-dependencies.md
+          text: "04 Understand Circular Dependencies and Early References"
+        - href: en/tutorial/05-bean-lifecycle.md
+          text: "05 Manage the Bean Lifecycle and Extension Points"
+        - href: en/tutorial/06-annotation-driven-injection.md
+          text: "06 Add Annotation-Driven Dependency Injection"
+        - href: en/tutorial/07-application-context-and-events.md
+          text: "07 Organize the Application Context and Events"
+        - href: en/tutorial/08-mvc-dispatch.md
+          text: "08 Implement MVC Request Dispatch"
+        - href: en/tutorial/09-request-parameter-binding.md
+          text: "09 Bind Request Parameters to Method Arguments"
+        - href: en/tutorial/10-return-values-and-views.md
+          text: "10 Handle Return Values and Render Views"
+        - href: en/tutorial/11-jdbc-template.md
+          text: "11 Encapsulate JDBC with a Template"
+        - href: en/tutorial/12-sql-metadata.md
+          text: "12 Turn SQL into Managed Metadata"
+        - href: en/tutorial/13-dynamic-proxies.md
+          text: "13 Enhance Business Methods with Dynamic Proxies"
+        - href: en/tutorial/14-interceptor-chains.md
+          text: "14 Build Interceptor Chains and Pointcuts"
+        - href: en/tutorial/15-automatic-proxying.md
+          text: "15 Integrate Automatic Proxying with IoC"
+        - href: en/tutorial/16-transactions.md
+          text: "16 Connect AOP and JDBC with Transactions"
+        - href: en/tutorial/17-end-to-end-application.md
+          text: "17 Build and Test the Complete Application"
+        - section: "Appendices"
+          contents:
+            - href: en/tutorial/verification.md
+              text: "Code verification"
+            - href: en/tutorial/implementation-notes.md
+              text: "Implementation boundaries"
+  page-footer:
+    left: "一步步手写 Spring · Spring from Scratch"
+    right:
+      - text: "CodeIdea AI"
+        href: "https://codeideaai.github.io/"
+      - text: "GitHub"
+        href: "https://github.com/codeideaai/spring-from-scratch"
+
+format:
+  html:
+    theme:
+      light: cosmo
+      dark: darkly
+    css: styles.css
+    toc: true
+    toc-depth: 3
+    smooth-scroll: true
+    code-copy: true
+    code-overflow: scroll
+
+filters:
+  - filters/site-links.lua
+
+execute:
+  eval: false
+
+lang: en

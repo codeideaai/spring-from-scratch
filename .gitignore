@@ -1,0 +1,11 @@
+build/
+target/
+.DS_Store
+
+.quarto/
+_site/
+__pycache__/
+*.py[cod]
+
+/.quarto/
+**/*.quarto_ipynb

@@ -1,0 +1,5 @@
+---
+pagetitle: "Spring from Scratch"
+---
+
+{{< include README.md >}}

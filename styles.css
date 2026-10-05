@@ -1,0 +1,15 @@
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+main.content {
+  line-height: 1.8;
+}
+.sidebar-item-text {
+  line-height: 1.5;
+}
+pre.sourceCode {
+  border-radius: 0.5rem;
+}
+.table {
+  font-size: 0.95rem;
+}

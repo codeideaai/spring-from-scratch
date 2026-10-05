@@ -1,0 +1,12 @@
+---
+pagetitle: "Spring from Scratch"
+lang: en
+sidebar: en
+include-in-header:
+  text: |
+    <meta http-equiv="refresh" content="0; url=en/">
+---
+
+# Spring from Scratch
+
+[Read the English tutorial](en/index.qmd) · [中文](zh.qmd)
