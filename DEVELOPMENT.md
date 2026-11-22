@@ -52,3 +52,14 @@ quarto render
 main 更新后，工作流检查格式、34 份文章程序、独立项目和跨进程持久化，再构建发布网站。默认英文入口、中英文逐篇切换与站内链接都应随发布验证。
 
 站点：[Spring from Scratch](https://codeideaai.github.io/spring-from-scratch/)。
+
+## 导出 PDF 和 EPUB
+
+安装 Python 3.9+、Pandoc 3.1.11+ 和 Typst 0.14+；生成 PDF 还需要 Noto CJK 字体（含 `Noto Serif CJK SC` / `Noto Sans Mono CJK SC`）。如需在离线版将导读流程图渲染为图片，另装 Graphviz（`dot`）；未安装时仍保留流程图源码。
+
+```sh
+python3 scripts/export_book.py
+python3 scripts/export_book.py --language zh --format epub
+```
+
+默认在 `_exports/` 生成中、英文各一份 PDF 和 EPUB，直接使用现有教程与附录，不影响 `quarto render` 生成的网页。可用 `--output-dir` 指定输出目录；只导出 EPUB 不需要 Typst。
